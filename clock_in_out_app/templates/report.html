@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+    <title>Report Page</title>
+    <style>
+        body {
+            padding: 30px 30px;
+            background: #313e63;
+            height: 100vh;
+        }
+
+        .navbar {
+            background: #141b33;
+            height: 81px;
+            padding: 0 60px;
+            border-radius: 9px;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar::before,
+        .navbar::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+        }
+
+        .navbar::before,
+        .navbar::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            bottom: 15px;
+            left: 10px;
+            width: 50%;
+            height: 20%;
+        }
+
+        .navbar::before,
+        .navbar::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            bottom: 15px;
+            left: 10px;
+            width: 50%;
+            height: 20%;
+            box-shadow: 0 15px 12px rgba(0, 0, 0, 0.7);
+            transform: rotate(-1.5deg);
+        }
+
+        .navbar::after {
+            right: 10px;
+            left: auto;
+            transform: rotate(1.5deg);
+        }
+
+        .navbar a {
+            color: #bbc4e3;
+            font-size: 21px;
+        }
+
+        .row {
+            margin: 30px 0;
+            height: auto;
+        }
+
+        .row-left {
+            background: #141b33;
+            opacity: 80%;
+            color: #bbc4e3;
+            height: 100%;
+            border-radius: 9px;
+            padding: 15px 30px;
+        }
+
+        .row-right {
+            background: #141b33;
+            opacity: 80%;
+            color: #bbc4e3;
+            height: 100%;
+            border-radius: 9px;
+            padding: 15px 30px;
+        }
+
+        .divide {
+            height: 0px;
+            border: 0.5px solid rgba(255, 255, 255, 0.1);
+            margin: 21px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#" style="color:white;">Employee Clock In/Out System</a>
+            </div>
+            <a href="/clockinout">Clock In/Out</a>
+            <a href="/points">Points</a>
+            <a href="/report">Daily Report</a>
+            <a href="/settings">Settings</a>
+            <a href="/logout">Log Out</a>
+        </div>
+    </nav>
+    <div class="row">
+        <div class="col-md-3.5 row-left">
+            <div class="left-row">
+                <h2>{{ this_user.first_name }} {{ this_user.last_name }}</h2>
+                {% if this_user.user_level == 9 %}
+                <a href="/admin" style="color:gold;">Admin View <- click here to display as an admin</a> {% endif %}
+                        </div> <div class="left-row">
+                        {% if not last_clock.clockin and not last_clock.clockout %}
+                        <form action="/clockin" method="post">
+                            {% csrf_token %}
+                            <p>{{ date_cur }}</p>
+
+                            <button class="btn btn-success btn-lg" type="submit" value="Clockin">Clockin</button>
+                        </form>
+                        {% elif last_clock.clockin and not last_clock.clockout %}
+                        {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        <form action="/clockout" method="post">
+                            {% csrf_token %}
+                            <p>{{ date_cur }}</p>
+                            <button class="btn btn-danger btn-lg btn-block" type="submit"
+                                value="Clockout">Clockout</button>
+                            <textarea style="min-width: 100%" name="task_des"
+                                placeholder="Task Description(e.g. Completed wireframes for EPS user side" cols="30"
+                                rows="8"></textarea>
+                        </form>
+                        {% else %}
+                        <form action="/clockin" method="post">
+                            {% csrf_token %}
+                            <p>{{ date_cur }}</p>
+                            <button class="btn btn-success btn-lg" type="submit" value="Clockin">Clockin</button>
+                        </form>
+                        {% endif %}
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-link btn-lg" data-toggle="modal" data-target="#myModal"
+                            style="padding:12px 0; color:#21a6e9">
+                            Forgot to Clock Out LastTime? <- Click here to fix it! </button> <!-- Modal -->
+                                <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+                                    aria-labelledby="myModalLabel">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="myModalLabel">
+                                                    {{ date_cur | date:'H:i | d M Y'}}
+                                                </h4>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            </div>
+                                            <form action="/clockout_lasttime" method="post">
+                                                {% csrf_token %}
+                                                <div class="modal-body">
+                                                    <button type="submit" style="min-width: 100%"
+                                                        class="btn btn-danger btn-lg">Clock
+                                                        Out</button>
+                                                    <select name="clock_out" style="min-width: 100%">
+                                                        {% for choice in last_clockout_choices %}
+                                                        <option value="{{ choice | date:'Y-m-d H:i' }}">
+                                                            {{ choice | date:'Y-m-d H:i' }}
+                                                        </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <textarea style="min-width: 100%" name="task_des"
+                                                        placeholder="Task Description(e.g. Completed wireframes for EPS user side"
+                                                        cols="30" rows="10"></textarea>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="divide"></div>
+                                <div class="left-row">
+                                    <h2>My Points</h2>
+                                    <h2 style="color:#2da0e1">{{ this_user_points }}</h2>
+                                    <h2>Vilage Points</h2>
+                                    <h2 style=" color:#da696f">{{ all_users_points }}</h2>
+                                </div>
+                                <div class="divide"></div>
+                                <div class="left-row">
+                                    <h2>Daily Quote</h2>
+                                    <p>{{ today_quote.quote }}</p>
+                                    -
+                                    <p>{{ today_quote.author}}</p>
+                                </div>
+            </div>
+        </div>
+        <div class="col-md-0.5 row-middle">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp
+        </div>
+        <div class="col-md-8 row-right">
+            <h2 style="margin-bottom:18px;">Compose Your Daily Updates</h2>
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <form action="/report/report_verify" method="post">
+                {% csrf_token %}
+                <select name="get_clock" class="custom-select custom-select-sm mb-2" style="display: block;">
+                    <option value="">-- Select a Clock and do a Daily Report for it! --</option>
+                    {% for clock in this_user.clocks.all %}
+                    <option value="{{ clock.id }}">{{ clock.task_des }} - {{ clock.created_at }}
+                        -{{ clock.user.first_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <div class="divide"></div>
+                <h3 style="margin:15px 0;">Recipients Lists</h3>
+                <input class="form-control col-xs-12" type=" text" name="recipients" placeholder="Add recipients here.">
+                <h3 style="margin:15px 0;">What I Did Today</h3>
+                <textarea class="form-control col-xs-12" name="done" cols="120" rows="6"
+                    placeholder="Type the things you did today here."></textarea>
+                <h3 style="margin:15px 0;">Challenges I encountered</h3>
+                <textarea class="form-control col-xs-12" name="challenges" cols="120" rows="6"
+                    placeholder="Type the chanllenges you encountered today here."></textarea>
+                <h3 style="margin:15px 0;">What you can do to help</h3>
+                <textarea class="form-control col-xs-12" name="helps" cols="120" rows="6"
+                    placeholder="Type the things you need admins to help you with here."></textarea>
+                <div class="divide"></div>
+                <button class="btn btn-info btn-lg btn-block" type="submit" style="margin-bottom:15px">Submit Daily
+                    Report</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

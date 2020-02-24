@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Bootstrap  CSS-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Index Page</title>
+    <style>
+        body {
+            padding: 30px 30px;
+            /* background: #313e63; */
+            background: #424d7a;
+            height: auto;
+        }
+
+        .navbar {
+            background: #141b33;
+            height: 81px;
+            padding: 0 60px;
+            border-radius: 9px;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar::before,
+        .navbar::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+        }
+
+        .navbar::before,
+        .navbar::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            bottom: 15px;
+            left: 10px;
+            width: 50%;
+            height: 20%;
+        }
+
+        .navbar::before,
+        .navbar::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            bottom: 15px;
+            left: 10px;
+            width: 50%;
+            height: 20%;
+            box-shadow: 0 15px 12px rgba(0, 0, 0, 0.7);
+            transform: rotate(-1.5deg);
+        }
+
+        .navbar::after {
+            right: 10px;
+            left: auto;
+            transform: rotate(1.5deg);
+        }
+
+        .navbar a {
+            color: #bbc4e3;
+            font-size: 21px;
+        }
+
+        .row {
+            margin: 30px 0;
+            background: #141b33;
+            opacity: 80%;
+            color: #bbc4e3;
+            height: 100%;
+            border-radius: 9px;
+            padding: 15px 30px;
+        }
+
+        .intro_li:hover {
+            background: rgba(255, 255, 255, 0.1)
+        }
+
+        .divide {
+            height: 0px;
+            border: 0.5px solid rgba(255, 255, 255, 0.05);
+            margin: 21px 0;
+        }
+
+        .HomeNav {
+            text-shadow: 0 0 12px #293151;
+        }
+
+        .navbar a {
+            text-decoration: none;
+        }
+
+        .navbar a:hover {
+            text-shadow: 0 0 15px white;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand HomeNav" href="#" style="color:white;">Employee
+                    Clock In/Out System</a>
+            </div>
+            <a href="/clockinout"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>Clock
+                In/Out</a>
+            <a href="/points"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>Points</a>
+            <a href="/report">Daily Report</a>
+            <a href="/settings">Settings</a>
+            <a href="/login">Login</a>
+        </div>
+    </nav>
+    <div class="row">
+        <div class="col-md-12">
+            <h1 style="margin:30px 0;text-align: center; color:white;">Welcome To Employee
+                Management System
+            </h1>
+            {% if messages %}
+            <ul class="messages" style="text-align: center;">
+                {% for message in messages %}
+                <li {% if message.tags %} class="{{ message.tags }}" {% endif %} style="list-style-type:none;">
+                    {{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <div class=" divide">
+            </div>
+            <ul>
+                <li class="intro_li">
+                    <h3>Manage Employees</h3>
+                    <h4>Using this application, admins will be able to add, remove, and edit employees for the
+                        application.
+                    </h4>
+                </li>
+                <div class="divide"></div>
+                <li class="intro_li">
+                    <h3>Daily Update</h3>
+                    <h4>Employees will be able to update what's done today.</h4>
+                </li>
+                <div class="divide"></div>
+                <li class="intro_li">
+                    <h3>Time Management</h3>
+                    <h4>User can change their Time-Zone based on their preference.</h4>
+                </li>
+                <div class="divide"></div>
+                <li class="intro_li">
+                    <h3>Tracking Performance</h3>
+                    <h4>All users can user this app to track his own daily-performance</h4>
+                </li>
+                <div class="divide"></div>
+                <li class="intro_li">
+                    <h3>Reward System</h3>
+                    <h4>Employee get reward based on their daily working-hour and the contributions they added to the
+                        company.</h4>
+                </li>
+                <div class="divide"></div>
+                <form action="/login" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-primary btn-lg btn-block" type="submit" value="Clockin">Login And Start
+                        Tracking
+                        My Time</button>
+                </form>
+            </ul>
+        </div>
+    </div>
+</body>
+
+</html>

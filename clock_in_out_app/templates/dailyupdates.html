@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+    <title>DailyUpdates Page</title>
+    <style>
+        body {
+            padding: 30px 30px;
+            background: silver;
+            height: 100vh;
+        }
+
+        .navbar {
+            background: #141b33;
+            height: 81px;
+            padding: 0 60px;
+            border-radius: 9px;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar::before,
+        .navbar::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+        }
+
+        .navbar::before,
+        .navbar::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            bottom: 15px;
+            left: 10px;
+            width: 50%;
+            height: 20%;
+        }
+
+        .navbar::before,
+        .navbar::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            bottom: 15px;
+            left: 10px;
+            width: 50%;
+            height: 20%;
+            box-shadow: 0 15px 12px rgba(0, 0, 0, 0.7);
+            transform: rotate(-1.5deg);
+        }
+
+        .navbar::after {
+            right: 10px;
+            left: auto;
+            transform: rotate(1.5deg);
+        }
+
+        .navbar a {
+            color: #bbc4e3;
+            font-size: 21px;
+        }
+
+        .row {
+            margin: 30px 0;
+            height: auto;
+        }
+
+        .row-left {
+            background: #141b33;
+            opacity: 80%;
+            color: #bbc4e3;
+            height: 100%;
+            border-radius: 9px;
+            padding: 15px 30px;
+        }
+
+        .row-right {
+            background: #141b33;
+            opacity: 80%;
+            color: #bbc4e3;
+            height: 100%;
+            border-radius: 9px;
+            padding: 15px 30px;
+        }
+
+        .divide {
+            height: 0px;
+            border: 0.5px solid rgba(255, 255, 255, 0.1);
+            margin: 21px 0;
+        }
+
+        .HomeNav {
+            text-shadow: 0 0 12px #293151;
+        }
+
+        .navbar a {
+            text-decoration: none;
+        }
+
+        .navbar a:hover {
+            text-shadow: 0 0 15px white;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand HomeNav" href="#" style="color:white;">Employee
+                    Clock In/Out System</a>
+            </div>
+            <a href="/admin">Manage Employee</a>
+            <a href="/dailyupdates">Daily Updates</a>
+            <a href="/logout">Log Out</a>
+        </div>
+    </nav>
+    <div class="row">
+        <div class="col-md-3.5 row-left">
+            <div class="left-row">
+                <h2>{{ this_user.first_name }} {{ this_user.last_name }}</h2>
+                {% if this_user.user_level == 9 %}
+                <a href="/clockinout">Employee View</a>
+                {% endif %}
+            </div>
+            <div class="divide"></div>
+            <div class="left-row">
+                <div class="left-row">
+                    <h2>My Points</h2>
+                    <h2 style="color:#2da0e1">{{ this_user_points }}</h2>
+                    <h2>Vilage Points</h2>
+                    <h2 style=" color:#da696f">{{ all_users_points }}</h2>
+                </div>
+                <div class="divide"></div>
+                <div class="left-row">
+                    {% if today_quote.onEdit == True %}
+                    <form action="/admin/update_quote/{{today_quote.id}}" method="post" style="width: 535px;">
+                        {% csrf_token %}
+                        <textarea name="quote" class="form-control" rows="5" style="margin:12px 0;">{{ today_quote.quote }}
+                                </textarea>
+                        <input type="text" class="form-control" name="author" value="{{ today_quote.author}}"
+                            style="margin:12px 0;">
+                        <button type="submit" class="btn btn-primary btn-block">Save Edit</button>
+                    </form>
+                    {% else %}
+                    <p>{{ today_quote.quote }}</p>
+                    -
+                    <p>{{ today_quote.author }}</p>
+                    <form action="/admin/edit_quote/{{today_quote.id}}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info btn-block">Edit Quote</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-0.5 row-middle">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp
+        </div>
+        <div class="col-md-8 row-right">
+            <h1>Daily Updates</h1>
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+                    {{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <form action="/dailyupdates/updates_get_employee_id" method="post">
+                {% csrf_token %}
+                <select name="updates_get_employee_id" class="custom-select custom-select-sm mb-2">
+                    <option value="">-- select an employee and only show his daily-updates! --</option>
+                    {% for employee in employees %}
+                    <option value="{{ employee.id }}">{{ employee.first_name }} {{ employee.last_name}}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-info btn-sm btn-block">Submit</button>
+            </form>
+            <div class="divide"></div>
+            <table class="table table-striped table-bordered table-hover table-dark">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Employee Name</th>
+                        <th scope="col">Date of Report</th>
+                        <th scope="col">View Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if get_employee.id %}
+                    {% for report in get_employee.user_reports.all %}
+                    <tr>
+                        <td>{{ get_employee.first_name }} {{ get_employee.last_name }}</td>
+                        <td>{{ report.created_at }}</td>
+                        <td>
+                            <button type="button" class="btn btn-link btn-sm" data-toggle="modal"
+                                data-target="#View_Update_{{ report.id }}">
+                                <a href="#">View Update</a>
+                            </button>
+
+                            <!-- Modal View Updates -->
+                            <div class="modal fade" id="View_Update_{{ report.id }}" tabindex="-1" role="dialog"
+                                aria-labelledby="myModalLabel">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h3>{{ report.create_at }}</h3>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        </div>
+                                        <div class="modal-body row">
+                                            <div class="col-md-4">
+                                                <h4>{{ report.user.first_name }} {{ report.user.last_name }}</h4>
+                                                <p>{{ report.user.email }}</p>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h2>What I did today</h2>
+                                                <p>{{ report.done }}</p>
+                                                <h2>Challenges I encountered</h2>
+                                                <p>{{ report.challenges }}</p>
+                                                <h2>What you can do to help me</h2>
+                                                <p>{{ report.helps }}</p>
+                                                <!-- button for modal -->
+                                                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal"
+                                                    data-target="#Award_Extra_Modal_{{ report.id }}">
+                                                    Award {{ report.user.first_name }} Extra
+                                                </button>
+                                                <!-- Modal Award-Extra-Points -->
+                                                <div class="modal fade" id="Award_Extra_Modal_{{ report.id }}"
+                                                    tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-label="Close"><span
+                                                                        aria-hidden="true">&times;</span></button>
+                                                            </div>
+                                                            <form
+                                                                action="/dailyupdates/award_extra_verify/{{ report.user.id }}/{{ get_report.id }}"
+                                                                method="post">
+                                                                {% csrf_token %}
+                                                                <div class="modal-body">
+                                                                    <h4>{{ report.user.first_name }}
+                                                                        {{ report.user.last_name }}</h4>
+                                                                    <p>{{ report.user.email }}</p>
+                                                                    <h3>AWARD EXTRA POINTS</h3>
+                                                                    <input type="number" name="point_value"
+                                                                        placeholder="Points Value">
+                                                                    <textarea name="reasons" cols="30" rows="10"
+                                                                        placeholder="Reason for adding points"></textarea>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="submit" style="min-width: 100%"
+                                                                        class="btn btn-success btn-lg">ADD</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    {% for employee in employees %}
+                    <tr>
+                        <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td>{{ employee.user_reports.last.created_at }}</td>
+                        <td>
+                            <button type="button" class="btn btn-link btn-sm" data-toggle="modal"
+                                data-target="#View_Update_{{ employee.id }}">
+                                <a href="#">View Update</a>
+                            </button>
+
+                            <!-- Modal View Updates -->
+                            <div class="modal fade" id="View_Update_{{ employee.id }}" tabindex="-1" role="dialog"
+                                aria-labelledby="myModalLabel">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <form action="/dailyupdates/get_report_id" method="post">
+                                                {% csrf_token %}
+                                                <select name="get_report_id">
+                                                    <option value="">-- select a date to view the udpates
+                                                        --</option>
+                                                    {% for report in employee.user_reports.all %}
+                                                    <option value="{{ report.id }}">
+                                                        Report
+                                                        Date:{{ report.created_at | date:'Y-m-d H:i'}}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                                <button type="submit">Submit</button>
+                                            </form>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        </div>
+                                        <div class="modal-body row">
+                                            <div class="col-md-4">
+                                                <h4>{{ employee.first_name }} {{ employee.last_name }}</h4>
+                                                <p>{{ employee.email }}</p>
+                                            </div>
+                                            <div class="col-md-8">
+                                                {% if get_report and get_report.user.id == employee.id%}
+                                                <h2>What I did today</h2>
+                                                <p>{{ get_report.done }}</p>
+                                                <h2>Challenges I encountered</h2>
+                                                <p>{{ get_report.challenges }}</p>
+                                                <h2>What you can do to help me</h2>
+                                                <p>{{ get_report.helps }}</p>
+                                                <!-- button for modal -->
+                                                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal"
+                                                    data-target="#Award_Extra_Modal_{{ get_report.id }}">
+                                                    Award {{ employee.first_name }} Extra
+                                                </button>
+                                                <!-- Modal Award-Extra-Points -->
+                                                <div class="modal fade" id="Award_Extra_Modal_{{ get_report.id }}"
+                                                    tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-label="Close"><span
+                                                                        aria-hidden="true">&times;</span></button>
+                                                            </div>
+                                                            <form
+                                                                action="/dailyupdates/award_extra_verify/{{ employee.id }}/{{ get_report.id }}"
+                                                                method="post">
+                                                                {% csrf_token %}
+                                                                <div class="modal-body">
+                                                                    <h4>{{ employee.first_name }}
+                                                                        {{ employee.last_name }}</h4>
+                                                                    <p>{{ employee.email }}</p>
+                                                                    <h3>AWARD EXTRA POINTS</h3>
+                                                                    <input type="number" name="point_value"
+                                                                        placeholder="Points Value">
+                                                                    <textarea name="reasons" cols="30" rows="10"
+                                                                        placeholder="Reason for adding points"></textarea>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="submit" style="min-width: 100%"
+                                                                        class="btn btn-success btn-lg">ADD</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% elif not employee.user_reports.all %}
+                                                <h2>{{ employee.first_name }} has not reported yet!</h2>
+                                                {% else %}
+                                                <p>Nothing to display for now unless you select a report to display!
+                                                </p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

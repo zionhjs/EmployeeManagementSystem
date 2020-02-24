@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Bootstrap  CSS-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Register Page</title>
+    <style>
+        body {
+            padding: 30px 30px;
+            /* background: #313e63; */
+            background: #424d7a;
+            height: 100vh;
+        }
+
+        s .navbar {
+            background: #141b33;
+            height: 81px;
+            padding: 0 60px;
+            border-radius: 9px;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar::before,
+        .navbar::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+        }
+
+        .navbar::before,
+        .navbar::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            bottom: 15px;
+            left: 10px;
+            width: 50%;
+            height: 20%;
+        }
+
+        .navbar::before,
+        .navbar::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            bottom: 15px;
+            left: 10px;
+            width: 50%;
+            height: 20%;
+            box-shadow: 0 15px 12px rgba(0, 0, 0, 0.7);
+            transform: rotate(-1.5deg);
+        }
+
+        .navbar::after {
+            right: 10px;
+            left: auto;
+            transform: rotate(1.5deg);
+        }
+
+        .navbar a {
+            color: #bbc4e3;
+            font-size: 21px;
+        }
+
+        .container {
+            margin: 0 auto;
+            margin-top: 90px;
+            background: #141b33;
+            opacity: 80%;
+            width: 450px;
+            color: #bbc4e3;
+            border-radius: 9px;
+            padding: 15px 30px;
+        }
+
+        .intro_li:hover {
+            background: rgba(255, 255, 255, 0.1)
+        }
+
+        .divide {
+            height: 0px;
+            border: 0.5px solid rgba(255, 255, 255, 0.05);
+            margin: 21px 0;
+        }
+
+        .HomeNav {
+            text-shadow: 0 0 12px #293151;
+        }
+
+        .navbar a {
+            text-decoration: none;
+        }
+
+        .navbar a:hover {
+            text-shadow: 0 0 15px white;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand HomeNav" href="#" style="color:white;">Employee
+                    Clock In/Out System</a>
+            </div>
+            <a href="/clockinout">Clock In/Out</a>
+            <a href="/points">Points</a>
+            <a href="/report">Daily Report</a>
+            <a href="/settings">Settings</a>
+            <a href="/login">Login</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Register</h1>
+        <div class="divide"></div>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <form action="/register_verify" method="post">
+            {% csrf_token %}
+            <h3 style="margin:9px 0">Email Address:</h3>
+            <input type="text" class="form-control" name="email">
+            <h3 style="margin:9px 0">First Name:</h3>
+            <input type="text" class="form-control" name="first_name">
+            <h3 style="margin:9px 0">Last Name:</h3>
+            <input type="text" class="form-control" name="last_name">
+            <h3 style="margin:9px 0">PassWord:</h3>
+            <input type="password" class="form-control" name="password">
+            <h3 style="margin:9px 0">Confirm PassWord:</h3>
+            <input type="password" class="form-control" name="password_confirm">
+            <button type="submit" class="btn btn-primary btn-block" style="margin:15px 0">Register</button>
+        </form>
+        <div class="divide"></div>
+        <a href="/login">Already have an account? Login</a>
+    </div>
+</body>
+
+</html>
