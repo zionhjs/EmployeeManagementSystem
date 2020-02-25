@@ -58,7 +58,7 @@ def register_verify(request):
         password = request.POST['password']
         user_pwd = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
         this_user = User.objects.create(email=email, first_name=first_name,
-                            last_name=last_name, password=user_pwd)
+                                        last_name=last_name, password=user_pwd)
         request.session['this_user_id'] = this_user.id
         first_user = User.objects.first()
         first_user.user_level = 9
@@ -72,7 +72,10 @@ def daily_quote():
     quote_list = []
     for quote in all_quotes:
         quote_list.append(quote)
-    last_quote = quote_list[-1]
+    if len(quote_list) > 0:
+        last_quote = quote_list[-1]
+    else:
+        last_quote = ''
     cur_date = datetime.now()
     if last_quote.updated_at.date() == cur_date.date():
         today_quote = last_quote
@@ -120,7 +123,7 @@ def clockinout(request):  # unfinished
         today_quote = daily_quote()
 
         clocks = Clock.objects.all().order_by('-created_at')
-        
+
         if Clock.objects.last():
             last_clock = Clock.objects.last()
             last_clockout_choice = last_clock.clockin.replace(
@@ -139,7 +142,7 @@ def clockinout(request):  # unfinished
         else:
             last_clock = {}
             last_clockout_choices = []
-        
+
         if request.session.get('show_employee_id'):
             show_employee_id = request.session['show_employee_id']
             show_employee = User.objects.get(id=show_employee_id)
@@ -149,7 +152,7 @@ def clockinout(request):  # unfinished
         context = {
             "this_user": this_user,
             "show_employee": show_employee,
-            "employees":User.objects.all(),
+            "employees": User.objects.all(),
             "today_quote": today_quote,
             "this_user_points": round(this_user.total_points, 2),
             "all_users_points": all_users_points,
@@ -161,7 +164,7 @@ def clockinout(request):  # unfinished
         return render(request, 'clockinout.html', context)
     else:
         messages.error(
-                request, 'Needs to be logged in to visit the system!')
+            request, 'Needs to be logged in to visit the system!')
         return redirect('/')
 
 
@@ -173,10 +176,12 @@ def get_employee(request):
             employee_id = request.POST['show_employee_id']
             this_employee = User.objects.get(id=employee_id)
             request.session['show_employee_id'] = employee_id
-            messages.success(request, f"Successfully showing {this_employee.first_name}'s Clock Records!")
+            messages.success(
+                request, f"Successfully showing {this_employee.first_name}'s Clock Records!")
             return redirect('/clockinout')
         else:
-            messages.error(request, "please select one employee and view his/her clocks!")
+            messages.error(
+                request, "please select one employee and view his/her clocks!")
             return redirect('/clockinout')
     else:
         return redirect('/')
@@ -283,7 +288,8 @@ def points(request):
         last_clock = Clock.objects.last()
 
         if request.session.get("show_employee_id"):
-            clocks = clocks.filter(user = User.objects.get(id = request.session.get("show_employee_id")))
+            clocks = clocks.filter(user=User.objects.get(
+                id=request.session.get("show_employee_id")))
 
         last_clockout_choice = last_clock.clockin.replace(
             tzinfo=None)  # remove the timezone
@@ -303,7 +309,7 @@ def points(request):
 
         context = {
             "this_user": this_user,
-            "employees":employees,
+            "employees": employees,
             "today_quote": today_quote,
             "this_user_points": round(this_user.total_points, 2),
             "all_users_points": all_users_points,
@@ -315,7 +321,7 @@ def points(request):
         return render(request, 'points.html', context)
     else:
         messages.error(
-                request, 'Needs to be logged in to visit the system!')
+            request, 'Needs to be logged in to visit the system!')
         return redirect('/')
 
 
@@ -383,7 +389,7 @@ def report(request):
         return render(request, 'report.html', context)
     else:
         messages.error(
-                request, 'Needs to be logged in to visit the system!')
+            request, 'Needs to be logged in to visit the system!')
         return redirect('/')
 
 # def get_clock_add_report(request):
@@ -409,7 +415,7 @@ def report_verify(request):
             request.session['report_clock_id'] = int(request.POST['get_clock'])
         else:
             messages.error(
-                    request, 'Needs to select a clock to do the report!')
+                request, 'Needs to select a clock to do the report!')
             return redirect('/report')
 
         cur_date = datetime.now()
@@ -419,7 +425,7 @@ def report_verify(request):
             for report in this_user_all_reports:
                 if report.created_at.date() == cur_date.date():
                     messages.error(
-                    request, 'Same User Can\'t report twice in a single-day!')
+                        request, 'Same User Can\'t report twice in a single-day!')
                     return redirect('/report')
 
         recipients = request.POST['recipients']
@@ -427,10 +433,12 @@ def report_verify(request):
         challenges = request.POST['challenges']
         helps = request.POST['helps']
         if request.session.get('report_clock_id'):
-            this_clock = Clock.objects.get(id = request.session.get('report_clock_id'))
-            print("this_clock is:", this_clock)   #worked here 
-            new_daily_report = DailyReport.objects.create(recipients=recipients, done=done, challenges=challenges, helps=helps, user=this_user, clock=this_clock)
-            print("new_daily_report:", new_daily_report)    #worked here 
+            this_clock = Clock.objects.get(
+                id=request.session.get('report_clock_id'))
+            print("this_clock is:", this_clock)  # worked here
+            new_daily_report = DailyReport.objects.create(
+                recipients=recipients, done=done, challenges=challenges, helps=helps, user=this_user, clock=this_clock)
+            print("new_daily_report:", new_daily_report)  # worked here
             request.session['report_clock_id'] = None
             messages.success(request, "Daily Report Successfully!")
             return redirect('/report')
@@ -506,7 +514,7 @@ def settings(request):
         return render(request, 'settings.html', context)
     else:
         messages.error(
-                request, 'Needs to be logged in to visit the system!')
+            request, 'Needs to be logged in to visit the system!')
         return redirect('/')
 
 
@@ -577,7 +585,7 @@ def admin(request):
         today_quote = daily_quote()
 
         clocks = Clock.objects.all().order_by('-created_at')
-        
+
         if Clock.objects.last():
             last_clock = Clock.objects.last()
             last_clockout_choice = last_clock.clockin.replace(
@@ -596,7 +604,7 @@ def admin(request):
         else:
             last_clock = {}
             last_clockout_choices = []
-         
+
         context = {
             "this_user": this_user,
             "employees": User.objects.all(),
@@ -607,7 +615,7 @@ def admin(request):
             "last_clock": last_clock,
             "date_cur": datetime.now().strftime("%H:%M %p. | %d-%M-%Y "),
             "last_clockout_choices": last_clockout_choices,
-            "level_range": [0,1,2,3,4,5,6,7,8,9]
+            "level_range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         }
         return render(request, 'admin.html', context)
     elif this_user.user_level < 9:
@@ -663,6 +671,7 @@ def award_extra_verify(request, uid, cid):
     else:
         return redirect('/')
 
+
 def report_award_extra_verify(request, uid, rid):
     this_id = request.session.get('this_user_id')
     this_user = User.objects.get(id=this_id)
@@ -677,7 +686,8 @@ def report_award_extra_verify(request, uid, rid):
         print(award_points)
         new_award = Award.objects.create(
             admin=this_user, user=award_user, clock=award_clock, points=award_points, reasons=reasons)
-        messages.success(request, f"Award {award_user.first_name} Extra {new_award.points} points successfully!")
+        messages.success(
+            request, f"Award {award_user.first_name} Extra {new_award.points} points successfully!")
         return redirect('/dailyupdates')
     else:
         return redirect('/')
@@ -693,7 +703,7 @@ def edit_employee_verify(request, uid):
                 messages.error(request, value)
             return redirect('/admin')
         else:
-            edit_user = User.objects.get(id = uid)
+            edit_user = User.objects.get(id=uid)
             edit_user.first_name = request.POST['first_name']
             edit_user.last_name = request.POST['last_name']
             edit_user.email = request.POST['email']
@@ -704,6 +714,7 @@ def edit_employee_verify(request, uid):
             return redirect('/admin')
     else:
         return redirect('/')
+
 
 def dailyupdates(request):
     this_id = request.session.get('this_user_id')
@@ -758,15 +769,15 @@ def dailyupdates(request):
         while last_clockout_choice < lastclock_midnight_time:
             last_clockout_choices.append(last_clockout_choice)
             last_clockout_choice += timedelta(minutes=30)
-        
+
         get_report = {}
         if request.session.get('get_report_id'):
             get_report_id = request.session.get('get_report_id')
-            get_report = DailyReport.objects.get(id = get_report_id)
+            get_report = DailyReport.objects.get(id=get_report_id)
             request.session['get_report_id'] = None
         else:
             get_report_id = None
-        
+
         if get_report:
             pass
         else:
@@ -778,25 +789,26 @@ def dailyupdates(request):
         get_employee = {}
         if request.session.get('get_employee_id'):
             get_employee_id = request.session.get('get_employee_id')
-            get_employee = User.objects.get(id = get_employee_id)
+            get_employee = User.objects.get(id=get_employee_id)
             request.session['get_employee_id'] = None
         else:
             get_employee_id = None
-        
+
         if get_employee:
             pass
         else:
             get_employee = {}
 
         print('get_employee_id is:', get_employee_id)
-        print('session[get_employee_id]:', request.session.get('get_employee_id'))
+        print('session[get_employee_id]:',
+              request.session.get('get_employee_id'))
 
         context = {
             "this_user": this_user,
             "employees": User.objects.all(),
-            "get_report_id":get_report_id,
-            "get_report":get_report,
-            "get_employee":get_employee,
+            "get_report_id": get_report_id,
+            "get_report": get_report,
+            "get_employee": get_employee,
             "today_quote": today_quote,
             "this_user_points": round(this_user.total_points, 2),
             "all_users_points": all_users_points,
@@ -804,7 +816,7 @@ def dailyupdates(request):
             "last_clock": last_clock,
             "date_cur": datetime.now().strftime("%H:%M %p. | %d-%M-%Y "),
             "last_clockout_choices": last_clockout_choices,
-            "level_range": [0,1,2,3,4,5,6,7,8,9]
+            "level_range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         }
         return render(request, 'dailyupdates.html', context)
     else:
@@ -821,6 +833,7 @@ def dailyupdates(request):
 #     else:
 #         return redirect('/')
 
+
 def get_employee_points(request):
     this_id = request.session.get('this_user_id')
     this_user = User.objects.get(id=this_id)
@@ -829,13 +842,16 @@ def get_employee_points(request):
             employee_id = request.POST['show_employee_id']
             this_employee = User.objects.get(id=employee_id)
             request.session['show_employee_id'] = employee_id
-            messages.success(request, f"Successfully showing {this_employee.first_name}'s Clock Records!")
+            messages.success(
+                request, f"Successfully showing {this_employee.first_name}'s Clock Records!")
             return redirect('/points')
         else:
-            messages.error(request, "please select one employee and view his/her clocks!")
+            messages.error(
+                request, "please select one employee and view his/her clocks!")
             return redirect('/points')
     else:
         return redirect('/')
+
 
 def updates_get_employee_id(request):
     this_id = request.session.get('this_user_id')
@@ -844,13 +860,16 @@ def updates_get_employee_id(request):
         if request.POST.get('updates_get_employee_id'):
             updates_get_employee_id = request.POST['updates_get_employee_id']
             request.session['get_employee_id'] = updates_get_employee_id
-            print("get_employee_id:", request.session.get('updates_get_employee_id'))
+            print("get_employee_id:", request.session.get(
+                'updates_get_employee_id'))
             return redirect('/dailyupdates')
         else:
-            messages.error(request, 'Please Select an employee and only show his daily-updates!')
+            messages.error(
+                request, 'Please Select an employee and only show his daily-updates!')
             return redirect('/dailyupdates')
     else:
         return redirect('/')
+
 
 def get_report_id(request):
     this_id = request.session.get('this_user_id')
@@ -862,8 +881,8 @@ def get_report_id(request):
             print("get_report_id:", request.session.get('get_report_id'))
             return redirect('/dailyupdates')
         else:
-            messages.error(request, 'Please Select a Date to show this employee\'s report!')
+            messages.error(
+                request, 'Please Select a Date to show this employee\'s report!')
             return redirect('/dailyupdates')
     else:
         return redirect('/')
-

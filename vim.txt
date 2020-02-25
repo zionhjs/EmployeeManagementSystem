@@ -1,5 +1,17 @@
-ALLOWED_HOSTS = ['18.144.29.46']
+ALLOWED_HOSTS = ['52.53.232.172']
 
+gunicorn clock_in_out_proj.wsgi
+
+[Unit]
+Description=gunicorn daemon
+After=network.target
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/EmployeeManagementSystem
+ExecStart=/home/ubuntu/EmployeeManagementSystem/env/bin/gunicorn --workers 3 --bind unix:/home/ubuntu/EmployeeManagementSystem/clock_in_out_proj.sock clock_in_out_proj.wsgi:application
+[Install]
+WantedBy=multi-user.target
 
 [Unit]
 Description=gunicorn daemon
@@ -18,7 +30,7 @@ gunicorn clock_in_out_proj.wsgi
 
 server {
   listen 80;
-  server_name 18.144.29.46;
+  server_name 52.53.232.172;
   location = /favicon.ico { access_log off; log_not_found off; }
   location /static/ {
       root /home/ubuntu/EmployeeManagementSystem;
@@ -28,7 +40,6 @@ server {
       proxy_pass http://unix:/home/ubuntu/EmployeeManagementSystem/clock_in_out_proj.sock;
   }
 }
-
 sudo vim /etc/nginx/sites-available/clock_in_out_proj
 
 sudo ln -s /etc/nginx/sites-available/clock_in_out_proj /etc/nginx/sites-enabled
